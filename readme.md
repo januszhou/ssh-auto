@@ -1,4 +1,6 @@
 ## SSH Auto
+![](http://i.giphy.com/l0Iy2kob2gyllHGak.gif)
+
 This project based on [Warp](https://github.com/jpalardy/warp), I added ability for users who needs password to login and tired on copied & pasted.
 
 ### Installation
