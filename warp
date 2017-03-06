@@ -33,26 +33,19 @@ warp() {
   local SSH=${SSH:-ssh}
   local COMMAND=""
 
-  if [ $(cat "$TARGET" | wc -l) -gt 1 ]; then
-    # determine which clusterssh to use based on os
-    unamestr=`uname`
-    if [[ "$unamestr" == 'Linux' ]]; then
-      SSH=${MULTISSH:-cssh}
-    elif [[ "$unamestr" == 'Darwin' ]]; then
-      SSH=${MULTISSH:-csshX}
-    fi
-
-    COMMAND="$(awk -v cmd=$SSH 'BEGIN {printf cmd} {printf " " $1} END { print "" }' "$TARGET")"
-  else
+  if [[ $(cat "$TARGET" | wc -l) ]]; then
     line=$(head -n 1 $TARGET)
 
     CONFIG=(`echo ${line}`)
 
-    if [[ ${CONFIG[2]} ]]; then 
+    if [[ ${CONFIG[2]} ]]; then
+
+      pass=$(printf '%q' "${CONFIG[2]}")
+
       eval 'expect -c "
-        spawn ssh ${CONFIG[1]} -o PubkeyAuthentication=no
+        spawn ssh -o PubkeyAuthentication=no ${CONFIG[1]}
         expect {
-          \"*assword\" {set timeout 6000; send \"${CONFIG[2]}\n\";}
+          \"*assword\" {set timeout 6000; send '$pass'\n;}
           \"yes/no\" {send \"yes\n\"; exp_continue;}
           \"Last*\" {  send_user \"login success ${CONFIG[1]}\";}
         }   
